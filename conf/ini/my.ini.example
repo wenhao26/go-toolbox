@@ -1,0 +1,5 @@
+# Centrifugo API
+[cent]
+addr = "http://127.0.0.1:9501/api"
+key = "123456"
+channel = "channel"
