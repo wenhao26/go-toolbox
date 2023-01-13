@@ -47,6 +47,7 @@ func doCent() {
 		Key:  key,
 	})
 
+	// 直接推送效果
 	/*pubData, _ := json.Marshal(PublishData{
 		PubDate: time.Now().String(),
 	})
@@ -58,10 +59,14 @@ func doCent() {
 
 	// 模拟定时发布效果
 	c := cron.New()
-	_ = c.AddFunc("*/2 * * * * *", func() {
+	_ = c.AddFunc("*/1 * * * * *", func() {
 		testPubTimer(client, channel)
 	})
 	c.Start()
+
+	/*ch := make(chan os.Signal)
+	signal.Notify(ch, syscall.SIGINT)
+	<-ch*/
 
 	t1 := time.NewTimer(time.Second * 10)
 	for {
