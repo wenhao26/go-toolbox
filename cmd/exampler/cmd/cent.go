@@ -87,4 +87,21 @@ func testPubTimer(client *gocent.Client, channel string) {
 		panic(fmt.Sprintf("调用发布时出错：%v", err))
 	}
 	fmt.Printf("发布到频道 %s 成功, 流位置 {offset: %d, epoch: %s} \n", channel, pubResult.Offset, pubResult.Epoch)
+
+	// 加入管道发布策略
+	/*pipe := client.Pipe()
+	_ = pipe.AddPublish(channel, []byte(`{"input": "test1"}`))
+	_ = pipe.AddPublish(channel, []byte(`{"input": "test2"}`))
+	_ = pipe.AddPublish(channel, []byte(`{"input": "test3"}`))
+	replies, err := client.SendPipe(context.Background(), pipe)
+	if err != nil {
+		log.Fatalf("Error sending pipe: %v", err)
+	}
+	for _, reply := range replies {
+		if reply.Error != nil {
+			log.Fatalf("Error in pipe reply: %v", err)
+		}
+	}
+	log.Printf("Sent %d publish commands in one HTTP request ", len(replies))*/
+
 }
