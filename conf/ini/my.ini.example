@@ -1,5 +1,16 @@
 # Centrifugo API
 [cent]
-addr = "http://127.0.0.1:9501/api"
-key = "123456"
+addr = "http://119.91.202.245:9501/api"
+key = "7c2da7dd-c51f-430b-966f-e39bb4254346"
 channel = "channel"
+
+[redis]
+addr = "127.0.0.1:6379"
+password = ""
+db = 2
+
+[mongodb]
+host = "192.168.1.16"
+port = 27017
+username = "admin"
+password = "admin_1xm"
