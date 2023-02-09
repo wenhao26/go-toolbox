@@ -1,4 +1,4 @@
-package MQ
+package main
 
 import (
 	"encoding/json"
