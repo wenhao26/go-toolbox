@@ -1,0 +1,80 @@
+package main
+
+import (
+	"log"
+	"sync"
+	"time"
+
+	"github.com/beanstalkd/go-beanstalk"
+)
+
+type Bean struct {
+	Conn *beanstalk.Conn
+}
+
+func New() *Bean {
+	conn, err := beanstalk.Dial("tcp", "127.0.0.1:11300")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return &Bean{conn}
+}
+
+func (b *Bean) PutTask(body []byte) {
+	// 参数分别为任务，优先级，延时时间，处理任务时间
+	id, _ := b.Conn.Put(body, 1, 0, 120*time.Second)
+	log.Println("PUB#JOB-ID=", id)
+}
+
+func (b *Bean) ReserveTask() {
+	// 为了防止某个consume长时间占用，设置了timeout
+	id, body, err := b.Conn.Reserve(5 * time.Second)
+	if err != nil {
+		log.Println(err)
+	}
+	if id > 0 {
+		log.Println("SUB#JOB-ID=", id, ";BODY=", string(body))
+		_ = b.Conn.Delete(id)
+	}
+}
+
+func main() {
+	var wg sync.WaitGroup
+
+	bean := New()
+
+	// pub
+	wg.Add(1)
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				return
+			}
+		}()
+		for {
+			msg := time.Now().String()
+			bean.PutTask([]byte(msg))
+			time.Sleep(time.Millisecond * 100)
+		}
+	}()
+
+	// sub
+	wg.Add(1)
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				return
+			}
+		}()
+		for {
+			bean.ReserveTask()
+		}
+	}()
+
+	defer wg.Done()
+	wg.Wait()
+
+	/*c := make(chan os.Signal)
+	signal.Notify(c, syscall.SIGINT)
+	<-c*/
+}

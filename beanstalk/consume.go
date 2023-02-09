@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/beanstalkd/go-beanstalk"
@@ -11,20 +11,31 @@ import (
 func main() {
 	conn, err := beanstalk.Dial("tcp", "127.0.0.1:11300")
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 
-	for {
-		id, body, err := conn.Reserve(500 * time.Second)
-		if err != nil {
-			log.Fatal(err)
+	var wg sync.WaitGroup
+
+	wg.Add(1)
+	go func() {
+		defer func() {
+			if err := recover(); err != nil {
+				return
+			}
+		}()
+		for {
+			// 为了防止某个consume长时间占用，设置了timeout
+			id, body, err := conn.Reserve(5 * time.Second)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			if id > 0 {
+				log.Println("SUB#JOB-ID=", id, ";BODY=", string(body))
+				_ = conn.Delete(id)
+			}
 		}
-		if id > 0 {
-			fmt.Println(id, string(body))
-
-			conn.Delete(id)
-		}
-
-	}
-
+	}()
+	defer wg.Done()
+	wg.Wait()
 }

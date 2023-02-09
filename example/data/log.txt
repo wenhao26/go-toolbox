@@ -1,0 +1,1 @@
+time="2023-02-09T15:28:06+08:00" level=info msg="info msg" func=main.main file="F:/go-toolbox/example/logrus.go:34"
