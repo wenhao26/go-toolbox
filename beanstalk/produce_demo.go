@@ -20,7 +20,7 @@ func main() {
 		for {
 			msg := []byte(time.Now().String())
 			b.Produce("P1", "channel1", msg, 1, 0, 5*time.Second)
-			time.Sleep(time.Millisecond * 50)
+			time.Sleep(time.Millisecond * 10)
 		}
 	}()
 	defer wg.Done()

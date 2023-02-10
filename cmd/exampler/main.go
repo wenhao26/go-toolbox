@@ -5,5 +5,6 @@ import (
 )
 
 func main() {
+	//  go run main.go [use名称]
 	cmd.Execute()
 }
