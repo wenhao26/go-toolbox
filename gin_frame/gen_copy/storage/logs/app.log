@@ -1,0 +1,6 @@
+{"level":"info","time":"2023-02-14 16:23:25","location":"gen_copy/main.go:46","msg":"服务启动中..."}
+{"level":"info","time":"2023-02-14 16:23:48","location":"gen_copy/main.go:46","msg":"服务启动中..."}
+{"level":"info","time":"2023-02-14 16:23:50","location":"gen_copy/main.go:46","msg":"服务启动中..."}
+{"level":"info","time":"2023-02-14 16:28:18","location":"gen_copy/main.go:46","msg":"服务启动中..."}
+{"level":"info","time":"2023-02-14 16:28:24","location":"gen_copy/main.go:46","msg":"服务启动中..."}
+{"level":"info","time":"2023-02-14 16:28:34","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
