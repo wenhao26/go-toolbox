@@ -3,3 +3,4 @@
 config.toml
 conf/ini/my.ini
 gin_frame/gen_copy/app.ini
+gin_frame/gen_copy/storage
