@@ -452,3 +452,13 @@
 {"level":"info","time":"2023-02-15 10:19:35","location":"gen_copy/main.go:46","msg":"服务启动中..."}
 {"level":"info","time":"2023-02-15 10:19:51","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
 {"level":"info","time":"2023-02-15 10:19:53","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
+{"level":"info","time":"2023-02-15 14:07:39","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
+{"level":"info","time":"2023-02-15 14:07:40","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
+{"level":"info","time":"2023-02-15 14:07:40","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
+{"level":"info","time":"2023-02-15 14:07:40","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
+{"level":"info","time":"2023-02-15 14:07:40","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
+{"level":"info","time":"2023-02-16 09:21:11","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
+{"level":"info","time":"2023-02-16 09:21:11","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
+{"level":"info","time":"2023-02-16 09:21:11","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
+{"level":"info","time":"2023-02-16 09:21:11","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
+{"level":"info","time":"2023-02-16 09:21:12","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
