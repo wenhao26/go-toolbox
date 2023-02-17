@@ -66,5 +66,5 @@ func main() {
 		}
 	}
 
-	fmt.Println(" >>> 歌词播放结束")
+	fmt.Println(" >>> END <<< ")
 }

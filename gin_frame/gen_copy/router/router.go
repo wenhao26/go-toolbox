@@ -4,6 +4,8 @@ import (
 	"time"
 
 	limitMaxAllowed "github.com/aviddiviner/gin-limit"
+	"github.com/gin-contrib/cache"
+	"github.com/gin-contrib/cache/persistence"
 	"github.com/gin-gonic/gin"
 	limit "github.com/yangxikun/gin-limit-by-key"
 	"golang.org/x/time/rate"
@@ -33,10 +35,12 @@ func RegisterRouters(engine *gin.Engine) {
 	{
 		v1 := r.Group("/v1")
 		{
+			store := persistence.NewInMemoryStore(time.Minute)
 			trace := controllers.TraceController
 
 			// 追踪访问行为
-			v1.Group("/trace").GET("/access-behavior", trace.AccessBehavior)
+			//v1.Group("/trace").GET("/access-behavior", trace.AccessBehavior)
+			v1.Group("/trace").GET("/access-behavior", cache.CachePage(store, time.Minute, trace.AccessBehavior))
 
 			// todo...
 		}

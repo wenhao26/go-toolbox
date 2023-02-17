@@ -17,3 +17,9 @@ password = "admin_1xm"
 
 [xinzhi_weather]
 api_key = "Shhih***8UIcs7s"
+
+[mysql]
+dialect = mysql
+dsn = root:root@tcp(127.0.0.1:3306)/blog?charset=utf8mb4&parseTime=True&loc=Local
+max_idle_conn = 5
+max_open_conn = 50
