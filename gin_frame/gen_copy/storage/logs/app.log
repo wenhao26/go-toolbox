@@ -467,3 +467,5 @@
 {"level":"info","time":"2023-02-17 14:43:42","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
 {"level":"info","time":"2023-02-17 14:46:28","location":"gen_copy/main.go:46","msg":"服务启动中..."}
 {"level":"info","time":"2023-02-17 14:46:44","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
+{"level":"info","time":"2023-02-17 15:45:33","location":"controllers/trace.go:18","msg":"Request-API:/trace/access-behavior"}
+{"level":"debug","time":"2023-02-17 16:05:08","location":"gen_copy/main.go:82","msg":"GIN服务已正常关闭"}
