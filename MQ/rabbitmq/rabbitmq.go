@@ -7,7 +7,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-const Url = "amqp://hujiao:13579abc1226@119.91.202.245:5672/"
+const Url = "amqp://test:test@127.0.0.1:5672/"
 
 type RabbitMQ struct {
 	conn    *amqp.Connection
