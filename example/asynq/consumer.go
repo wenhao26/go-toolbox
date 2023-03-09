@@ -28,8 +28,8 @@ func main() {
 	})
 
 	mux := asynq.NewServeMux()
-	mux.HandleFunc(tasks.CommonTask, doTask)
-	mux.HandleFunc(tasks.DelayTask, doTask)
+	go mux.HandleFunc(tasks.CommonTask, doTask)
+	go mux.HandleFunc(tasks.DelayTask, doTask)
 	if err := server.Run(mux); err != nil {
 		panic(err)
 	}
