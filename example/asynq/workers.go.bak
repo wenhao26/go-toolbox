@@ -1,0 +1,60 @@
+package main
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+
+	"github.com/hibiken/asynq"
+)
+
+func handler(ctx context.Context, t *asynq.Task) error {
+	switch t.Type() {
+	case "email:welcome":
+		fmt.Println("welcome=", t.Payload())
+	case "email:reminder":
+		fmt.Println("reminder=", t.Payload())
+	}
+	return nil
+}
+
+func sendWelcomeEmail(ctx context.Context, t *asynq.Task) error {
+	p := map[string]interface{}{}
+	_ = json.Unmarshal(t.Payload(), &p)
+	fmt.Println("welcome=", p)
+	return nil
+}
+
+func sendReminderEmail(ctx context.Context, t *asynq.Task) error {
+	p := map[string]interface{}{}
+	_ = json.Unmarshal(t.Payload(), &p)
+	fmt.Println("reminder=", p)
+	return nil
+}
+
+func main() {
+	server := asynq.NewServer(asynq.RedisClientOpt{
+		Addr:     "127.0.0.1:6379",
+		Password: "",
+		DB:       0,
+	}, asynq.Config{
+		Concurrency: 10,
+		Queues: map[string]int{
+			"critical": 6,
+			"default":  3,
+			"low":      1,
+		},
+	})
+
+	//if err := server.Run(asynq.HandlerFunc(handler)); err != nil {
+	//	panic(err)
+	//}
+
+	mux := asynq.NewServeMux()
+	mux.HandleFunc("email:welcome", sendWelcomeEmail)
+	mux.HandleFunc("email:reminder", sendReminderEmail)
+	if err := server.Run(mux); err != nil {
+		panic(err)
+	}
+
+}

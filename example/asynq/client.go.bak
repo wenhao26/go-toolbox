@@ -1,0 +1,38 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"time"
+
+	"github.com/hibiken/asynq"
+)
+
+func main() {
+	client := asynq.NewClient(asynq.RedisClientOpt{
+		Addr:     "127.0.0.1:6379",
+		Password: "",
+		DB:       0,
+	})
+
+	// 创建任务
+	payload1, _ := json.Marshal(map[string]interface{}{"user_id": 88})
+	t1 := asynq.NewTask("email:welcome", payload1)
+
+	payload2, _ := json.Marshal(map[string]interface{}{"user_id": 99})
+	t2 := asynq.NewTask("email:reminder", payload2)
+
+	// 立即处理任务
+	info1, err := client.Enqueue(t1)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("result: %+v\n", info1)
+
+	// 24小时后处理任务
+	info2, err := client.Enqueue(t2, asynq.ProcessIn(1*time.Minute))
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("result: %+v\n", info2)
+}
