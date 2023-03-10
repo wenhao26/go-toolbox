@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/robfig/cron"
@@ -24,8 +25,9 @@ type FcmPushLog struct {
 }
 
 var (
-	delLimit int
-	cronSpec int
+	delLimit  int
+	cronSpec  int
+	runNumber int
 
 	db *gorm.DB
 )
@@ -39,6 +41,7 @@ func init() {
 	BaseSection := config.Section("base")
 	delLimit = BaseSection.Key("del_limit").MustInt(500)
 	cronSpec = BaseSection.Key("cron_spec").MustInt(30)
+	runNumber = BaseSection.Key("run_number").MustInt(5)
 
 	MysqlSection := config.Section("mysql")
 	dsn := MysqlSection.Key("dsn").String()
@@ -46,7 +49,8 @@ func init() {
 	maxOpen := MysqlSection.Key("max_open_conn").MustInt(50)
 
 	DB, err := gorm.Open(mysql.New(mysql.Config{DSN: dsn}), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		//Logger: logger.Default.LogMode(logger.Info),
+		Logger: logger.Default.LogMode(logger.Silent), // 最低级，无论如何都不输出日志了
 	})
 	if err != nil {
 		panic(err)
@@ -71,9 +75,10 @@ func delLogs() {
 	var pushLog FcmPushLog
 
 	pushLogs := []FcmPushLog{}
-	db.Table(pushLog.TableName()).Select("id").Limit(delLimit).Find(&pushLogs)
+	db.Debug().Table(pushLog.TableName()).Select("id").Limit(delLimit).Find(&pushLogs)
 	if len(pushLogs) == 0 {
-		//os.Exit(0)
+		fmt.Println("无处理数据，退出程序")
+		os.Exit(0)
 	}
 	db.Table(pushLog.TableName()).Delete(&pushLogs)
 	log.Println("删除日志数量：", len(pushLogs))
@@ -82,7 +87,9 @@ func delLogs() {
 func main() {
 	c := cron.New()
 	_ = c.AddFunc(fmt.Sprintf("*/%d * * * * *", cronSpec), func() {
-		go delLogs()
+		for i := 0; i < runNumber; i++ {
+			go delLogs()
+		}
 	})
 	c.Start()
 
