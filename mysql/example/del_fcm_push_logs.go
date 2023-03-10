@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/panjf2000/ants/v2"
 	"github.com/robfig/cron"
 	"gopkg.in/ini.v1"
 	"gorm.io/driver/mysql"
@@ -85,11 +86,19 @@ func delLogs() {
 }
 
 func main() {
+	p, _ := ants.NewPool(10, ants.WithPreAlloc(false))
+	defer p.Release()
+
 	c := cron.New()
 	_ = c.AddFunc(fmt.Sprintf("*/%d * * * * *", cronSpec), func() {
 		for i := 0; i < runNumber; i++ {
-			go delLogs()
+			_ = p.Submit(func() {
+				delLogs()
+			})
 		}
+		//for i := 0; i < runNumber; i++ {
+		//	go delLogs()
+		//}
 	})
 	c.Start()
 
