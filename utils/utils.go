@@ -3,6 +3,7 @@ package utils
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"regexp"
 
 	"github.com/google/uuid"
 	"github.com/lithammer/shortuuid/v4"
@@ -50,6 +51,12 @@ func GenShortUUID() string {
 // 生成安全地全球唯一ID
 func GenXID() string {
 	return xid.New().String()
+}
+
+// 校验邮箱是否合法
+func ValidateEmail(email string) bool {
+	regex := regexp.MustCompile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
+	return regex.MatchString(email)
 }
 
 
