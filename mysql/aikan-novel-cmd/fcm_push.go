@@ -74,8 +74,8 @@ func isValidTask(pushTime int64) bool {
 }
 
 func send() {
-	fcmKey := "AAAAJvC5qwU:APA91bHM1Mqqp43E_oZHEx_KwLY3F6Nsv1CqxVIw1TOsezmadsL4MsLouEp0LSRVVNaiBlcOEzGbNrPrNNWtVrhIegtFg4csmfiCLZc9oKRC1oo3lMeSR9wjPbDJEaP7w1ZZJ_IxvldB"
-	_ = "167247457029"
+	fcmKey := ""
+	_ = ""
 
 	data := map[string]string{
 		"title": "title",
@@ -83,7 +83,7 @@ func send() {
 		"msg":   "msg",
 	}
 	ids := []string{
-		"fyfxdVORTfSh4ZoYfkh50r:APA91bEtVw1REVQcl8xg78aTk4i_t60FxuaNH_UvRw9UXVSG9NgX6QNoXrkBmPUx5ZWopYhb1e0M1v2u5Yng05LZxFtv3uu30OdK_mu-igzRtGejtwaSlxHGL5FzZXcF1SpySKiHFM6d",
+		"",
 	}
 
 	c := fcm.NewFcmClient(fcmKey)
