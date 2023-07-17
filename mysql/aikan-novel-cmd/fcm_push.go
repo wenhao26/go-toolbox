@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/NaySoftware/go-fcm"
+
 	"toolbox/mysql/aikan-novel-cmd/global"
 	"toolbox/mysql/aikan-novel-cmd/initialize"
 	"toolbox/mysql/aikan-novel-cmd/storage"
@@ -53,9 +55,45 @@ func pullTasks() []Task {
 	return tasks
 }
 
+func pullTokens() []Token {
+	var token Token
+	var tokens []Token
+
+	global.DB.Debug().
+		Table(token.TableName()).
+		Select("user_id,token").
+		Order("id").
+		Limit(1000).
+		Find(&tokens)
+	return tokens
+}
+
 func isValidTask(pushTime int64) bool {
 	t := time.Now().Unix()
 	return t > pushTime && t-pushTime <= 600
+}
+
+func send() {
+	fcmKey := "AAAAJvC5qwU:APA91bHM1Mqqp43E_oZHEx_KwLY3F6Nsv1CqxVIw1TOsezmadsL4MsLouEp0LSRVVNaiBlcOEzGbNrPrNNWtVrhIegtFg4csmfiCLZc9oKRC1oo3lMeSR9wjPbDJEaP7w1ZZJ_IxvldB"
+	_ = "167247457029"
+
+	data := map[string]string{
+		"title": "title",
+		"body":  "body",
+		"msg":   "msg",
+	}
+	ids := []string{
+		"fyfxdVORTfSh4ZoYfkh50r:APA91bEtVw1REVQcl8xg78aTk4i_t60FxuaNH_UvRw9UXVSG9NgX6QNoXrkBmPUx5ZWopYhb1e0M1v2u5Yng05LZxFtv3uu30OdK_mu-igzRtGejtwaSlxHGL5FzZXcF1SpySKiHFM6d",
+	}
+
+	c := fcm.NewFcmClient(fcmKey)
+	c.NewFcmRegIdsMsg(ids, data)
+	status, err := c.Send()
+	if err != nil {
+		panic(err)
+	}
+
+	status.PrintResults()
 }
 
 func main() {
@@ -65,10 +103,19 @@ func main() {
 		os.Exit(0)
 	}
 
+	var tokenList []string
+	tokens := pullTokens()
+	for _, token := range tokens {
+		tokenList = append(tokenList, token.Token)
+	}
+	fmt.Println(tokenList)
+	os.Exit(0)
+
 	for _, task := range tasks {
 		ret := isValidTask(task.PushTime)
 		fmt.Println(ret)
 		fmt.Println(task.Id, task.Title, task.PushTime)
+
 	}
 }
 
