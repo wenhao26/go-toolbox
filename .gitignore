@@ -2,5 +2,6 @@
 .DS_Store
 config.toml
 conf/ini/my.ini
+example/influxdb/config.ini
 gin_frame/gen_copy/app.ini
 gin_frame/gen_copy/storage
