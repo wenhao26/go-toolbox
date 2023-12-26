@@ -8,6 +8,7 @@ import (
 	"github.com/mholt/archiver/v4"
 )
 
+// 压缩
 func main() {
 	filenames := map[string]string{
 		//"F:\\go-toolbox\\README.md": "README.md",
@@ -18,7 +19,7 @@ func main() {
 		panic(fmt.Sprintf("[1]%s", err))
 	}
 
-	out, err := os.Create("F:\\go-toolbox\\zip-test\\example.zip")
+	out, err := os.Create("F:\\zip-test\\example.zip")
 	if err != nil {
 		panic(fmt.Sprintf("[2]%s", err))
 	}
