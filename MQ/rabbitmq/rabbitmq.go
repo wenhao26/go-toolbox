@@ -7,7 +7,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-const Url = "amqp://test:test@127.0.0.1:5672/"
+const Url = "amqp://admin:admin@127.0.0.1:5672/"
 
 type RabbitMQ struct {
 	conn    *amqp.Connection
@@ -83,6 +83,8 @@ func (r *RabbitMQ) ConsumerSimple() {
 	if err != nil {
 		panic(err)
 	}
+
+	//r.channel.Qos(2000, 0, false)
 
 	// 接收消息
 	messages, err := r.channel.Consume(
