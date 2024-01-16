@@ -40,6 +40,13 @@ func ImageQuality(quality, inputImage, outputImage string) (string, error) {
 	return utils.Magick(params)
 }
 
+// 调整图片大小和质量压缩值
+func ImageResizeAndQuality(resize, quality, inputImage, outputImage string) (string, error) {
+	// convert -resize "500x300" -strip -quality 75% input.jpg output.jpg
+	params := []string{"convert", "-resize", resize, "-strip", "-quality", quality, inputImage, outputImage}
+	return utils.Magick(params)
+}
+
 // 裁剪图片
 func ImageCrop(x, y, cropWidth, cropHeight int, inputImage, outputImage string) (string, error) {
 	// magick convert -crop 600x700+100+100 input.jpg  output.png

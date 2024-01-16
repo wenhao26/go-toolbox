@@ -36,7 +36,10 @@ func main() {
 	//result, err := convert.ImageGrid9(filePath+"bird.jpg", filePath+"grids\\bird_grid_%d.png")
 
 	// 将图片切成N份格子图片
-	result, err := convert.ImageGrids(2, filePath+"2mb-image.jpg", filePath+"grids\\2mb-image\\2mb-image_%d.png")
+	//result, err := convert.ImageGrids(2, filePath+"2mb-image.jpg", filePath+"grids\\2mb-image\\2mb-image_%d.png")
+
+	// 调整图片大小和质量压缩
+	result, err := convert.ImageResizeAndQuality("800x700","85%", filePath + "20mb-image.jpg", filePath + "20mb-image__resize_quality_85.jpg")
 
 	if err != nil {
 		panic(err)
