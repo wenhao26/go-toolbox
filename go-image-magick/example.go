@@ -24,10 +24,19 @@ func main() {
 	//result, err := convert.ImageFormat(filePath + "bird.jpg", filePath + "bird_format.png")
 
 	// 调整图片尺寸
-	//result, err := convert.ImageResize("600x900", filePath + "bird.jpg", filePath + "magick\\bird_resize.jpg")
+	//result, err := convert.ImageResize("600x900", filePath + "bird.jpg", filePath + "bird_resize.jpg")
 
 	// 调节图片压缩比
-	result, err := convert.ImageQuality("75%", filePath + "bird.jpg", filePath + "magick\\bird_quality_75.jpg")
+	//result, err := convert.ImageQuality("75%", filePath + "bird.jpg", filePath + "bird_quality_75.jpg")
+
+	// 裁剪图片
+	//result, err := convert.ImageCrop(300, 200, 750, 750, filePath+"bird.jpg", filePath+"bird_crop_750.jpg")
+
+	// 九宫格图片
+	//result, err := convert.ImageGrid9(filePath+"bird.jpg", filePath+"grids\\bird_grid_%d.png")
+
+	// 将图片切成N份格子图片
+	result, err := convert.ImageGrids(2, filePath+"2mb-image.jpg", filePath+"grids\\2mb-image\\2mb-image_%d.png")
 
 	if err != nil {
 		panic(err)
