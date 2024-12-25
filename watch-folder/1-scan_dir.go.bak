@@ -1,0 +1,37 @@
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"time"
+)
+
+var query = "config.php"
+var matches int
+
+func search(path string) {
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, file := range files {
+		name := file.Name()
+		if name == query {
+			matches++
+		}
+		if file.IsDir() {
+			search(path + name + "\\")
+		}
+
+		//fmt.Println(name)
+	}
+}
+
+func main() {
+	startTime := time.Now()
+	search("D:\\www\\")
+
+	fmt.Println(matches, " matches.")
+	fmt.Println(time.Since(startTime))
+}
