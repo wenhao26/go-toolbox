@@ -134,6 +134,7 @@ require (
 	github.com/mholt/archiver/v3 v3.5.1 // indirect
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8 // indirect
 	github.com/miekg/dns v1.1.43 // indirect
+	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -162,6 +163,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect
 	github.com/samber/lo v1.38.1 // indirect
+	github.com/schollz/progressbar/v2 v2.15.0 // indirect
 	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
