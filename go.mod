@@ -2,8 +2,6 @@ module toolbox
 
 go 1.21
 
-toolchain go1.21.3
-
 require (
 	github.com/Shopify/sarama v1.37.2
 	github.com/beanstalkd/go-beanstalk v0.2.0
