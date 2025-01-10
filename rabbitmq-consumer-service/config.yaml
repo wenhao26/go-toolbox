@@ -1,0 +1,6 @@
+rabbitmq:
+  url: "amqp://admin:admin@localhost:5672/"
+  queue_name: "queue_20250109"
+  prefetch_count: 10 # 每个消费者的最大消息数
+  consumer_count: 3 # 消费者数量
+  worker_pool_size: 5 # 每个消费者的最大并发 Goroutine 数量
