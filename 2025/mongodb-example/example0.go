@@ -13,7 +13,7 @@ type User struct {
 	Name   string `bson:"name"`
 	Email  string `bson:"email"`
 	Age    int    `bson:"age"`
-	Status string `bson:status`
+	Status string `bson:"status"`
 }
 
 func main() {
