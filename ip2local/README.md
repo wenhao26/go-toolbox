@@ -1,3 +1,7 @@
+<h1>如何使用</h1>
+go run main.go -a pull
+go run main.go -a search -ip {IP}
+
 <h1>国家代码 - 中英文对照各国代码-各国英文缩写</h1>
 <table border="1" cellspacing="0">
   <tbody>
