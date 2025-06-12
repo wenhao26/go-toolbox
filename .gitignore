@@ -6,3 +6,6 @@ example/influxdb/config.ini
 gin_frame/gen_copy/app.ini
 gin_frame/gen_copy/storage
 logs_demo/logs
+2025/maxmind-geoip/geoip.db
+2025/maxmind-geoip/GeoLite2-City-Blocks-IPv4.csv
+2025/maxmind-geoip/GeoLite2-City-Locations-zh-CN.csv
