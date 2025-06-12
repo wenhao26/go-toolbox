@@ -17,3 +17,14 @@ CREATE TABLE IF NOT EXISTS ip_geo (
 	);
 
 CREATE INDEX IF NOT EXISTS idx_ip ON ip_geo ( "ip_start" DESC, "ip_end" ASC );
+
+## 启动服务
+### 1、先导入数据
+```bash
+go run import.go
+```
+
+### 2、启动HTTP
+```bash
+go run main.go
+```
