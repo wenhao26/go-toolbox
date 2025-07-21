@@ -82,6 +82,7 @@ func searchFilesConcurrentlyV1(rootPath, filename string) ([]string, error) {
 	return foundFiles, nil
 }
 
+// 使用：go run main.go -dir {检索目录路径} -filename {检索文件}
 func main() {
 	var dir string
 	var filename string
