@@ -77,6 +77,7 @@ require (
 	github.com/bodgit/sevenzip v1.3.0 // indirect
 	github.com/bodgit/windows v1.0.0 // indirect
 	github.com/bradfitz/gomemcache v0.0.0-20220106215444-fb4bf637b56d // indirect
+	github.com/capitalone/fpe v1.2.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/connesc/cipherio v0.2.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
