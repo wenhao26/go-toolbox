@@ -11,19 +11,19 @@ import (
 	"time"
 )
 
-// - 高性能文件搜索器，支持在指定目录下进行模糊检索
+// - 高性能文件搜索器，支持在指定目录下进行模糊检索（Gemini）
 // - 使用 go 的并发特性，通过扇出（Fan-out）/扇入（Fan-in）模式来并行检索
 // - 版本v1：潜在的瓶颈是目录遍历本身是单线程的，虽然工作协程可以并行检索文件，但只有一个协程在分发目录任务。
 //			对于包含大量子目录的巨大文件系统来说，这个分发者可能成为瓶颈。
 
 // searchFilesConcurrentlyV1 并发模型查找匹配文件
 func searchFilesConcurrentlyV1(rootPath, filename string) ([]string, error) {
-	jobs := make(chan string, 100)    // 用于分发目录给工作协程
-	results := make(chan string, 100) // 用于收集找到的文件路径
-
 	var wg sync.WaitGroup
+	jobs := make(chan string, 1000)    // 用于分发目录给工作协程
+	results := make(chan string, 1000) // 用于收集找到的文件路径
 
 	numWorkers := runtime.NumCPU()
+
 	for i := 0; i < numWorkers; i++ {
 		wg.Add(1)
 		go func() {
@@ -37,7 +37,7 @@ func searchFilesConcurrentlyV1(rootPath, filename string) ([]string, error) {
 				}
 
 				for _, entry := range entries {
-					fmt.Println(entry.Name())
+					// fmt.Println(entry.Name())
 					// 使用 filepath.Match 进行模糊匹配
 					match, err := filepath.Match(filename, entry.Name())
 					if err != nil {
