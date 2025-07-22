@@ -114,7 +114,6 @@ func (fs *FileSearcher) matchPattern(filename string) bool {
 
 // processResults 处理搜索结果并监听退出信号
 func (fs *FileSearcher) processResults() {
-
 	for {
 		select {
 		case sig := <-fs.sigChan:
