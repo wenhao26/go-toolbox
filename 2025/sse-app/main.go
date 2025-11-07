@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"math/rand"
+	"math"
 	"net/http"
 	"time"
 )
@@ -17,6 +17,36 @@ type PriceUpdate struct {
 // rootHandler 处理根路径，返回 HTML 文件
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "index.html")
+}
+
+const (
+	BasePrice     = 60000.00 // 基础价格（中心值）
+	Amplitude     = 5000.00  // 波动幅度
+	PeriodSeconds = 86400.0  // 波动周期：24小时 (86400秒)
+)
+
+// calculateDeterministicPrice 根据当前时间戳计算确定的模拟价格
+func calculateDeterministicPrice() float64 {
+	// 获取总的 Unix 时间戳（秒）
+	t := float64(time.Now().Unix())
+
+	// 将总时间戳限制在 0 到 PERIOD_SECONDS 之间
+	// math.Mod(t, PERIOD_SECONDS) 得到今天是这个周期（24小时）的第几秒
+	tMod := math.Mod(t, PeriodSeconds)
+
+	// 将时间映射到三角函数周期 (0 到 2π)
+	// phase 是当前时间戳在周期中的位置
+	phase := (tMod / PeriodSeconds) * 2 * math.Pi
+
+	// 使用余弦函数计算价格波动
+	// 余弦函数在 [-1, 1] 之间波动，保证价格变化自然平滑
+	oscillation := math.Cos(phase)
+
+	// 价格 = 基础价格 + 波动幅度 * 波动值
+	price := BasePrice + Amplitude*oscillation
+
+	// 确保两位小数精度
+	return math.Round(price*100) / 100
 }
 
 // sseHandler 处理 SSE 连接
@@ -36,9 +66,6 @@ func sseHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// 初始化一个虚拟价格
-	currentPrice := 60000.00
-
 	// 使用 select 结构，监听客户端连接关闭信号（r.Context().Done()）
 	// 并启动一个无限循环来推送数据
 	for {
@@ -50,8 +77,7 @@ func sseHandler(w http.ResponseWriter, r *http.Request) {
 
 		default:
 			// 模拟价格波动
-			// 价格在 +/- 100 范围内随机波动
-			currentPrice += (rand.Float64() - 0.5) * 200.00
+			currentPrice := calculateDeterministicPrice()
 
 			// 构建数据
 			update := PriceUpdate{
@@ -73,7 +99,6 @@ func sseHandler(w http.ResponseWriter, r *http.Request) {
 			time.Sleep(1 * time.Second)
 		}
 	}
-
 }
 
 func main() {
