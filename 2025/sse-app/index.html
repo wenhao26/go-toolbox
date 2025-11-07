@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Go + SSE 价格更新通知</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f4f4f9;
+        }
+
+        .price-card {
+            background-color: #ffffff;
+            padding: 20px 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        #price-display {
+            font-size: 3em;
+            color: #4CAF50;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        #timestamp {
+            font-size: 0.9em;
+            color: #777;
+        }
+
+        .status {
+            margin-top: 15px;
+            font-style: italic;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+<div class="price-card">
+    <h1>🚀 BTC/USD 实时价格</h1>
+    <div id="price-display">$ 0.00</div>
+    <div id="timestamp">最后更新时间: 暂无</div>
+    <p class="status">状态: <span id="status-message">正在连接...</span></p>
+</div>
+
+<script>
+    // 1. 创建 EventSource 实例，连接到 Go 服务器的 /events 端点
+    const eventSource = new EventSource("/events");
+    const priceDisplay = document.getElementById("price-display");
+    const timestampDisplay = document.getElementById("timestamp");
+    const statusMessage = document.getElementById("status-message");
+
+    // 2. 监听连接打开事件
+    eventSource.onopen = function (event) {
+        console.log("SSE 连接已打开");
+        statusMessage.textContent = "已连接";
+        statusMessage.style.color = 'green';
+    };
+
+    // 3. 监听接收到的消息（onmessage 是默认事件处理器）
+    eventSource.onmessage = function (event) {
+        console.log("收到数据:", event.data);
+
+        try {
+            // SSE 数据通常是字符串，我们将其解析为 JSON
+            const data = JSON.parse(event.data);
+
+            // 更新价格显示
+            priceDisplay.textContent = `$ ${parseFloat(data.price).toFixed(2)}`;
+
+            // 更新时间戳
+            timestampDisplay.textContent = `最后更新时间: ${data.timestamp}`;
+
+        } catch (e) {
+            console.error("解析数据失败:", e, event.data);
+        }
+    };
+
+    // 4. 监听错误事件
+    eventSource.onerror = function (error) {
+        console.error("SSE 连接错误:", error);
+        statusMessage.textContent = "连接错误，正在尝试重连...";
+        statusMessage.style.color = 'red';
+        // 浏览器内置的 EventSource 会自动尝试重连
+    };
+
+    // 5. 监听特定事件（可选，但通常用于结构化数据）
+    // eventSource.addEventListener("custom_event_name", function(event) { ... });
+
+</script>
+</body>
+</html>
