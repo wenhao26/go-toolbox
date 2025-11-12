@@ -1,6 +1,6 @@
 module toolbox
 
-go 1.21
+go 1.25
 
 require (
 	gitee.com/tym_hmm/rabbitmq-pool-go v1.0.14
