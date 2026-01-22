@@ -1,0 +1,42 @@
+# 基础应用配置
+app:
+  name: "timer-center"
+  env: "dev" # 运行环境: dev, test, prod
+  port: 8080
+  version: "v1.0.0"
+
+# 日志配置
+logger:
+  level: "debug" # debug, info, warn, error
+  file_path: "./logs/app.log"
+  max_size: 100 # 每个日志文件最大 100MB
+  max_backups: 5 # 保留最近 5 个备份
+  compress: true # 是否压缩旧日志
+
+# 数据库配置 (MySQL)
+mysql:
+  host: "127.0.0.1"
+  port: 3306
+  user: "root"
+  password: "password123" # 实战中建议通过环境变量覆盖此项
+  database: "timer_db"
+  max_open_conns: 100 # 最大打开连接数
+  max_idle_conns: 10 # 最大空闲连接数
+  conn_max_lifetime: 3600 # 连接最大存活时间(秒)
+
+# 缓存配置 (Redis)
+redis:
+  addr: "127.0.0.1:6379"
+  password: ""
+  db: 0
+  pool_size: 20 # 连接池大小
+
+# 鉴权配置 (JWT)
+jwt:
+  secret: "my-secret-key-7788" # 签名密钥
+  expire: 72 # 过期时间(小时)
+
+# 业务定时任务默认配置
+cron:
+  enable_seconds: true # 是否支持秒级触发
+  timeout: 30 # 单个任务执行超时时间(秒)
