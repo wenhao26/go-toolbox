@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>GoCron 任务管理系统</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            margin-bottom: 1.5rem;
+        }
+
+        .console-output {
+            background-color: #212529;
+            color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: Consolas, Monaco, monospace;
+            font-size: 13px;
+            height: 280px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .status-on {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .status-off {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .log-item {
+            border-bottom: 1px solid #3d4145;
+            padding: 2px 0 4px 0;
+            margin: 0;
+        }
+
+        .log-header {
+            color: #ffc107;
+            font-size: 12px;
+            margin: 0;
+            padding: 0;
+            display: block;
+        }
+
+        code {
+            color: #e83e8c;
+        }
+
+        .text-desc {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body class="container py-4">
+<h2 class="mb-4 text-primary">🚀 GoCron 任务管理控制台</h2>
+
+<div class="card p-4">
+    <h5 class="card-title mb-3">🛠️ 配置任务</h5>
+    <div class="row g-3">
+        <div class="col-md-2"><input type="text" id="t_id" class="form-control" placeholder="任务ID"></div>
+        <div class="col-md-2"><input type="text" id="t_expr" class="form-control" placeholder="Cron (*/5 * * * * *)">
+        </div>
+        <div class="col-md-3"><input type="text" id="t_cmd" class="form-control" placeholder="命令 (如: dir)"></div>
+        <div class="col-md-3"><input type="text" id="t_desc" class="form-control" placeholder="任务描述 (如: 清理日志)">
+        </div>
+        <div class="col-md-2">
+            <select id="t_status" class="form-select">
+                <option value="1">🟢 启用并运行</option>
+                <option value="0">⚪ 停止/禁用</option>
+            </select>
+        </div>
+        <div class="col-md-12 text-end">
+            <button onclick="saveTask()" class="btn btn-primary px-5">保存设置</button>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4">
+    <h5 class="card-title mb-3">📋 任务清单</h5>
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>描述</th>
+                <th>Cron 表达式</th>
+                <th>命令</th>
+                <th>状态</th>
+                <th style="width: 260px;">操作</th>
+            </tr>
+            </thead>
+            <tbody id="task-list-body"></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="card-title mb-0">🖥️ 运行日志: <span id="current-task-id" class="text-secondary">未选择</span></h5>
+        <button id="refresh-btn" onclick="refreshLogs()" class="btn btn-sm btn-outline-secondary">手动刷新日志</button>
+    </div>
+    <div id="log-console" class="console-output">点击任务列表中的“日志”获取详情...</div>
+</div>
+
+<script>
+    let selectedTaskId = "";
+    let tasksCache = {};
+
+    window.onload = function () {
+        fetchTasks();
+    };
+
+    async function fetchTasks() {
+        const res = await fetch('/api/tasks');
+        const tasks = await res.json();
+        document.getElementById('task-list-body').innerHTML = "";
+        if (tasks) {
+            tasks.forEach(task => {
+                tasksCache[task.id] = task;
+                updateTaskTable(task);
+            });
+        }
+    }
+
+    async function saveTask() {
+        const task = {
+            id: document.getElementById('t_id').value,
+            expr: document.getElementById('t_expr').value,
+            command: document.getElementById('t_cmd').value,
+            description: document.getElementById('t_desc').value, // 获取描述
+            status: parseInt(document.getElementById('t_status').value),
+            timeout: 60
+        };
+
+        if (!task.id || !task.expr || !task.command) {
+            alert("请填写完整的任务信息");
+            return;
+        }
+
+        const response = await fetch('/api/save', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(task)
+        });
+
+        if (response.ok) {
+            alert("操作成功！");
+            tasksCache[task.id] = task;
+            updateTaskTable(task);
+            document.getElementById('t_id').readOnly = false;
+            // 清空输入以便下次输入（可选，根据习惯）
+            // document.getElementById('t_desc').value = "";
+        }
+    }
+
+    function editTask(id) {
+        const task = tasksCache[id];
+        if (!task) return;
+
+        document.getElementById('t_id').value = task.id;
+        document.getElementById('t_id').readOnly = true;
+        document.getElementById('t_expr').value = task.expr;
+        document.getElementById('t_cmd').value = task.command;
+        document.getElementById('t_desc').value = task.description || ""; // 回填描述
+        document.getElementById('t_status').value = task.status;
+
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    async function toggleTask(id, newStatus) {
+        const task = tasksCache[id];
+        if (!task) return;
+        task.status = newStatus;
+        const response = await fetch('/api/save', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(task)
+        });
+        if (response.ok) {
+            updateTaskTable(task);
+        }
+    }
+
+    async function deleteTask(id) {
+        if (!confirm(`确定要彻底删除任务 [${id}] 吗？`)) return;
+        const response = await fetch('/api/delete?id=' + id, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+        });
+        if (response.ok) {
+            const row = document.getElementById('row-' + id);
+            if (row) row.remove();
+            delete tasksCache[id];
+            if (selectedTaskId === id) {
+                document.getElementById('log-console').innerHTML = "任务已删除";
+                selectedTaskId = "";
+            }
+        }
+    }
+
+    function updateTaskTable(task) {
+        const tbody = document.getElementById('task-list-body');
+        let row = document.getElementById('row-' + task.id);
+        const isRunning = task.status === 1;
+        const statusText = isRunning ? '<span class="status-on">运行中</span>' : '<span class="status-off">已停止</span>';
+        const toggleBtn = isRunning
+            ? `<button class="btn btn-sm btn-warning" onclick="toggleTask('${task.id}', 0)">停止</button>`
+            : `<button class="btn btn-sm btn-success" onclick="toggleTask('${task.id}', 1)">启动</button>`;
+
+        const html = `
+            <td><strong>${task.id}</strong></td>
+            <td><span class="text-desc">${task.description || '-'}</span></td>
+            <td><code>${task.expr}</code></td>
+            <td><code>${task.command}</code></td>
+            <td>${statusText}</td>
+            <td>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-primary" onclick="editTask('${task.id}')">编辑</button>
+                    <button class="btn btn-sm btn-info text-white" onclick="viewLogs('${task.id}')">日志</button>
+                    ${toggleBtn}
+                    <button class="btn btn-sm btn-danger" onclick="deleteTask('${task.id}')">删除</button>
+                </div>
+            </td>
+        `;
+
+        if (row) {
+            row.innerHTML = html;
+        } else {
+            row = document.createElement('tr');
+            row.id = 'row-' + task.id;
+            row.innerHTML = html;
+            tbody.appendChild(row);
+        }
+    }
+
+    async function viewLogs(id) {
+        selectedTaskId = id;
+        document.getElementById('current-task-id').innerText = id;
+        const consoleBox = document.getElementById('log-console');
+        consoleBox.innerHTML = "正在加载...";
+        consoleBox.scrollTop = 0;
+        refreshLogs();
+    }
+
+    async function refreshLogs() {
+        if (!selectedTaskId) return;
+        const consoleBox = document.getElementById('log-console');
+        const btn = document.getElementById('refresh-btn');
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 正在刷新...';
+
+        try {
+            const response = await fetch('/api/logs?id=' + selectedTaskId);
+            const logs = await response.json();
+            if (!logs || logs.length === 0) {
+                consoleBox.innerHTML = "暂无运行记录...";
+            } else {
+                consoleBox.innerHTML = logs.map(l => {
+                    const res = l.success ? 'SUCCESS' : 'FAILED';
+                    return `<div class="log-item"><div class="log-header">[${l.start_time}] ${res}</div><div>${l.output.trim()}</div></div>`;
+                }).join('');
+                consoleBox.scrollTop = 0;
+            }
+        } catch (e) {
+            consoleBox.innerHTML = "加载记录失败: " + e;
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '手动刷新日志';
+        }
+    }
+</script>
+</body>
+</html>
