@@ -28,8 +28,11 @@
 ## 📂 项目结构
 
 ```text
-squirrel-stat/
+squirrel-dir-stat/
 ├── main.go             # 程序入口，负责参数解析与性能统计
 ├── engine/
-│   └── engine.go       # 核心扫描引擎，包含并发调度与原子统计逻辑
+│   ├── scanner.go      # 并发扫描引擎，核心调度逻辑
+│   ├── counter.go      # 原子计数器与格式化工具
+│   └── util.go         # 辅助功能（如错误处理等）
 └── go.mod              # 项目依赖
+```
