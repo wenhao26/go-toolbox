@@ -1,0 +1,154 @@
+// 🚀 实战任务：高可靠 AI 文章批量处理引擎
+//
+// - 业务背景
+// 开发一个核心组件：TaskProcessor。将 20 篇小说的“章节标题”批量发送给 AI 进行内容生成，并将结果保存。
+//
+// - 核心需求
+// 结构体封装：使用 type TaskProcessor struct 模式，通过 NewTaskProcessor 初始化。
+//
+// 并发限流:
+// 1、AI 接口昂贵且有频率限制，要求同时执行的任务数不能超过 3 个
+// 2、必须使用 chan struct{} 来实现这个“令牌桶”
+//
+// 任务分发（流水线）：
+// 使用一个 jobs 通道传递标题，一个 results 通道接收生成的内容。
+//
+// 单次任务超时：
+// 每个章节的生成不能超过 5 秒，如果超时，该章节应返回错误，不能阻塞整个引擎。
+//
+// 优雅退出：
+// 所有任务派发完毕后，要按顺序关闭通道，确保“账房”（汇总协程）处理完最后一条结果后，主程序再退出。
+//
+
+package main
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"sync"
+	"time"
+)
+
+// TaskResult 任务执行结果
+type TaskResult struct {
+	Title   string
+	Content string
+	Err     error
+}
+
+// TaskProcessor 任务处理器结构体
+type TaskProcessor struct {
+	maxConcurrent int           // 最大并发数
+	limit         chan struct{} // 并发限流桶（信号量）
+	timeout       time.Duration // 单个任务超时时间
+	wg            sync.WaitGroup
+}
+
+// NewTaskProcessor 初始化任务处理器
+func NewTaskProcessor(maxConcurrent int, timeout time.Duration) *TaskProcessor {
+	if maxConcurrent <= 0 {
+		maxConcurrent = 1
+	}
+
+	return &TaskProcessor{
+		maxConcurrent: maxConcurrent,
+		limit:         make(chan struct{}, maxConcurrent),
+		timeout:       timeout,
+	}
+}
+
+// Run 运行调度方法
+func (p *TaskProcessor) Run(titles []string) {
+	log.Printf("🚀 启动任务处理器：任务总数 %d，最大并发数 %d", len(titles), p.maxConcurrent)
+
+	jobs := make(chan string, len(titles))
+	results := make(chan TaskResult, len(titles))
+
+	// 启用协程收集结果
+	// 使用独立通道 done 来确保主流程在处理完后再退出
+	collectorDone := make(chan struct{})
+	go func() {
+		defer close(collectorDone)
+		for result := range results {
+			if result.Err != nil {
+				log.Printf("❌ [失败] 标题: %s, 错误: %v", result.Title, result.Err)
+				continue
+			}
+			log.Printf("✅ [成功] 标题: %s", result.Title)
+		}
+	}()
+
+	// 批量分发任务
+	// 防止 titles 过大，导致主协程阻塞，使用异步投放并关闭
+	go func() {
+		for _, title := range titles {
+			jobs <- title
+		}
+		close(jobs) // 分发完毕
+	}()
+
+	// 启动 Worker-Pool
+	for i := 0; i < p.maxConcurrent; i++ {
+		p.wg.Add(1)
+		go p.worker(jobs, results)
+	}
+
+	// 等待所有 worker 处理完成
+	p.wg.Wait()
+	close(results)
+
+	<-collectorDone
+	log.Println("🏁 所有 AI 创作任务处理完毕，引擎优雅退出。")
+}
+
+// worker 工作者逻辑
+func (p *TaskProcessor) worker(jobs <-chan string, results chan<- TaskResult) {
+	defer p.wg.Done()
+
+	for title := range jobs {
+		// 抢占令牌，限流
+		p.limit <- struct{}{}
+
+		// 创建带超时的 Context
+		ctx, cancel := context.WithTimeout(context.Background(), p.timeout)
+
+		// 执行核心业务
+		content, err := p.mockGenerateAI(ctx, title)
+
+		// 封装结果并发送
+		results <- TaskResult{
+			Title:   title,
+			Content: content,
+			Err:     err,
+		}
+
+		// 任务结束，清理 Context 并释放令牌
+		cancel()
+		<-p.limit
+	}
+}
+
+// mockGenerateAI 模拟生成 AI 调用
+func (p *TaskProcessor) mockGenerateAI(ctx context.Context, title string) (string, error) {
+	select {
+	case <-time.After(3 * time.Second):
+		return fmt.Sprintf("这是关于《%s》的精彩 AI 生成内容...", title), nil
+	case <-ctx.Done():
+		return "", ctx.Err() // 超时或其他取消信号
+	}
+}
+
+func main() {
+	// 模拟 10 本书的标题
+	titles := make([]string, 10)
+	for i := 0; i < 10; i++ {
+		titles[i] = fmt.Sprintf("神秘代码第 %d 章", i+1)
+	}
+
+	processor := NewTaskProcessor(3, 4*time.Second)
+
+	startTime := time.Now()
+	processor.Run(titles)
+	fmt.Printf("\n⏱️ 总体执行耗时: %v\n", time.Since(startTime))
+}
