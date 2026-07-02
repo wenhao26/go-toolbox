@@ -1,0 +1,18 @@
+redis:
+  addr: "192.168.33.10:6379"
+  password: ""
+  db: 0
+  pool_size: 10
+
+queue:
+  name: "creation:task" # 源队列
+  processing_suffix: ":processing" # 处理中队列后缀，最终队列为 creation:task:processing
+  block_timeout: 5 # BLPOP/BRPOPLPUSH 阻塞超时（秒），0表示永久阻塞
+
+worker:
+  count: 5 # 并发worker数量
+  graceful_timeout: 30 # 优雅退出时等待正在处理任务的最大秒数
+
+log:
+  level: "info" # debug, info, warn, error
+  output: "stdout" # stdout 或文件路径
